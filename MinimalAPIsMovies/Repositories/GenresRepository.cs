@@ -47,10 +47,10 @@ namespace MinimalAPIsMovies.Repositories
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = @"if exists (select 1 from Genres where Id = @Id)
-	                        select 1
-                        else 
-	                        select 0";
+                var query = @"IF EXISTS (SELECT 1 FROM Genres WHERE Id = @Id)
+	                            SELECT 1
+                            ELSE 
+	                            SELECT 0";
 
                 var exists = await connection.QuerySingleAsync<bool>(query, new { id });
 
