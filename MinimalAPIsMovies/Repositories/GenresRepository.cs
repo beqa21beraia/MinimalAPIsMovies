@@ -32,6 +32,32 @@ namespace MinimalAPIsMovies.Repositories
             }
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"DELETE Genres
+                            WHERE Id = @Id";
+
+                await connection.ExecuteAsync(query, new { id });
+            }
+        }
+
+        public async Task<bool> ExistsAsync(int id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"if exists (select 1 from Genres where Id = @Id)
+	                        select 1
+                        else 
+	                        select 0";
+
+                var exists = await connection.QuerySingleAsync<bool>(query, new { id });
+
+                return exists;
+            }
+        }
+
         public async Task<List<Genre>> GetAllAsync()
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -45,7 +71,7 @@ namespace MinimalAPIsMovies.Repositories
             }
         }
 
-        public async Task<Genre?> GetById(int id)
+        public async Task<Genre?> GetByIdAsync(int id)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -57,6 +83,18 @@ namespace MinimalAPIsMovies.Repositories
 
                 return genre;
             }            
+        }
+
+        public async Task UpdateAsync(Genre genre)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"UPDATE Genres
+                              SET Name = @Name
+                              WHERE Id = @Id";
+                
+                await connection.ExecuteAsync(query, genre);
+            }
         }
     }
 }
