@@ -8,7 +8,7 @@
     "/genres": {
       "get": {
         "tags": [
-          "MinimalAPIsMovies"
+          "GenresEndpoints"
         ],
         "responses": {
           "200": {
@@ -18,7 +18,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Genre"
+                    "$ref": "#/components/schemas/GenreDTO"
                   }
                 }
               }
@@ -28,13 +28,13 @@
       },
       "post": {
         "tags": [
-          "MinimalAPIsMovies"
+          "GenresEndpoints"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Genre"
+                "$ref": "#/components/schemas/CreateGenreDTO"
               }
             }
           },
@@ -46,7 +46,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Genre"
+                  "$ref": "#/components/schemas/GenreDTO"
                 }
               }
             }
@@ -57,7 +57,7 @@
     "/genres/{id}": {
       "get": {
         "tags": [
-          "MinimalAPIsMovies"
+          "GenresEndpoints"
         ],
         "parameters": [
           {
@@ -72,13 +72,23 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenreDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       },
       "put": {
         "tags": [
-          "MinimalAPIsMovies"
+          "GenresEndpoints"
         ],
         "parameters": [
           {
@@ -95,21 +105,24 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Genre"
+                "$ref": "#/components/schemas/CreateGenreDTO"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "404": {
+            "description": "Not Found"
+          },
+          "204": {
+            "description": "No Content"
           }
         }
       },
       "delete": {
         "tags": [
-          "MinimalAPIsMovies"
+          "GenresEndpoints"
         ],
         "parameters": [
           {
@@ -123,8 +136,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "404": {
+            "description": "Not Found"
+          },
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -132,7 +148,17 @@
   },
   "components": {
     "schemas": {
-      "Genre": {
+      "CreateGenreDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GenreDTO": {
         "type": "object",
         "properties": {
           "id": {
@@ -150,7 +176,7 @@
   },
   "tags": [
     {
-      "name": "MinimalAPIsMovies"
+      "name": "GenresEndpoints"
     }
   ]
 }

@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.FileProviders;
+using MinimalAPIsMovies.Endpoints;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using MinimalAPIsMovies.Repositories;
@@ -39,57 +42,7 @@ app.UseSwaggerUI();
 app.UseCors();
 app.UseOutputCache();
 
-app.MapGet("/genres", async (IGenresRepository genresRepository) =>
-{
-    return await genresRepository.GetAllAsync();
-
-}).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("genres-get"));
-
-app.MapGet("/genres/{id:int}", async (int id, IGenresRepository genresRepository) =>
-{
-    var genre = await genresRepository.GetByIdAsync(id);
-
-    if (genre is null)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(genre);
-});
-
-app.MapPost("/genres", async (Genre genre, IGenresRepository genresRepository,
-    IOutputCacheStore outputCacheStore) =>
-{
-    await genresRepository.CreateAsync(genre);
-    await outputCacheStore.EvictByTagAsync("genres-get", default);
-    return TypedResults.Created($"/genres/{genre.Id}", genre);
-});
-
-app.MapPut("/genres/{id:int}", async (int id, Genre genre,
-    IGenresRepository repository, IOutputCacheStore outputCacheStore) =>
-{
-    var exists = await repository.ExistsAsync(id);
-
-    if(!exists)
-        return Results.NotFound();
-
-    await repository.UpdateAsync(genre);
-    await outputCacheStore.EvictByTagAsync("genres-get", default);
-    return Results.NoContent();
-});
-
-app.MapDelete("/genres/{id:int}", async (int id, IGenresRepository genresRepository,
-    IOutputCacheStore outputCacheStore) =>
-{
-    var exists = await genresRepository.ExistsAsync(id);
-
-    if (!exists)
-        return Results.NotFound();
-
-    await genresRepository.DeleteAsync(id);
-    await outputCacheStore.EvictByTagAsync("genres-get", default);
-    return Results.NoContent();
-});
+app.MapGroup("/genres").MapGenres();
 
 //Middlewares zone - END
 

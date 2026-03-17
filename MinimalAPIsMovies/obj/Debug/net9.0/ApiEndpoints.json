@@ -1,15 +1,15 @@
 [
   {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_1",
-    "RelativePath": "genres",
+    "ContainingType": "MinimalAPIsMovies.Endpoints.GenresEndpoints",
+    "Method": "GetGenres",
+    "RelativePath": "genres/",
     "HttpMethod": "GET",
     "IsController": false,
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[MinimalAPIsMovies.Entities.Genre, MinimalAPIsMovies, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[MinimalAPIsMovies.DTOs.GenreDTO, MinimalAPIsMovies, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -18,22 +18,22 @@
     ]
   },
   {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_4",
-    "RelativePath": "genres",
+    "ContainingType": "MinimalAPIsMovies.Endpoints.GenresEndpoints",
+    "Method": "Create",
+    "RelativePath": "genres/",
     "HttpMethod": "POST",
     "IsController": false,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "genre",
-        "Type": "MinimalAPIsMovies.Entities.Genre",
+        "Name": "createGenreDTO",
+        "Type": "MinimalAPIsMovies.DTOs.CreateGenreDTO",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "MinimalAPIsMovies.Entities.Genre",
+        "Type": "MinimalAPIsMovies.DTOs.GenreDTO",
         "MediaTypes": [
           "application/json"
         ],
@@ -42,8 +42,8 @@
     ]
   },
   {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_3",
+    "ContainingType": "MinimalAPIsMovies.Endpoints.GenresEndpoints",
+    "Method": "GetById",
     "RelativePath": "genres/{id:int}",
     "HttpMethod": "GET",
     "IsController": false,
@@ -57,15 +57,22 @@
     ],
     "ReturnTypes": [
       {
+        "Type": "MinimalAPIsMovies.DTOs.GenreDTO",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
         "Type": "System.Void",
         "MediaTypes": [],
-        "StatusCode": 200
+        "StatusCode": 404
       }
     ]
   },
   {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_5",
+    "ContainingType": "MinimalAPIsMovies.Endpoints.GenresEndpoints",
+    "Method": "Update",
     "RelativePath": "genres/{id:int}",
     "HttpMethod": "PUT",
     "IsController": false,
@@ -77,8 +84,8 @@
         "IsRequired": true
       },
       {
-        "Name": "genre",
-        "Type": "MinimalAPIsMovies.Entities.Genre",
+        "Name": "createGenreDTO",
+        "Type": "MinimalAPIsMovies.DTOs.CreateGenreDTO",
         "IsRequired": true
       }
     ],
@@ -86,13 +93,18 @@
       {
         "Type": "System.Void",
         "MediaTypes": [],
-        "StatusCode": 200
+        "StatusCode": 404
+      },
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 204
       }
     ]
   },
   {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_6",
+    "ContainingType": "MinimalAPIsMovies.Endpoints.GenresEndpoints",
+    "Method": "Delete",
     "RelativePath": "genres/{id:int}",
     "HttpMethod": "DELETE",
     "IsController": false,
@@ -108,7 +120,12 @@
       {
         "Type": "System.Void",
         "MediaTypes": [],
-        "StatusCode": 200
+        "StatusCode": 404
+      },
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 204
       }
     ]
   }
