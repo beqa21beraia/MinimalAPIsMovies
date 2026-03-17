@@ -1,1 +1,13 @@
+# Visual Studio cache/options
 .vs/
+
+# Sensitive settings
+MinimalAPIsMovies/appsettings.Development.json
+
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
