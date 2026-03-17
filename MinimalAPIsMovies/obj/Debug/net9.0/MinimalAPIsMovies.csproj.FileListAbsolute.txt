@@ -81,3 +81,5 @@ D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\runtimes\win
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Diagnostics.EventLog.dll
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Security.Cryptography.Pkcs.dll
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\obj\Debug\net9.0\MinimalAPIsMovies.sourcelink.json
+D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\AutoMapper.dll
+D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
