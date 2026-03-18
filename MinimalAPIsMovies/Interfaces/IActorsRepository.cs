@@ -2,13 +2,13 @@
 
 namespace MinimalAPIsMovies.Interfaces
 {
-    public interface IGenresRepository
+    public interface IActorsRepository
     {
-        Task<int> CreateAsync(Genre genre);
-        Task<List<Genre>> GetAllAsync();
+        Task<int> CreateAsync(Actor actor);
+        Task<List<Actor>> GetAllAsync();
         Task<Genre?> GetByIdAsync(int id);
         Task<bool> ExistsAsync(int id);
-        Task UpdateAsync(Genre genre);
+        Task UpdateAsync(Actor actor);
         Task DeleteAsync(int id);
     }
 }

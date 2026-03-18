@@ -3,27 +3,28 @@ using Microsoft.Data.SqlClient;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using System.Data;
+using System.Diagnostics.Contracts;
 
 namespace MinimalAPIsMovies.Repositories
 {
-    public class GenresRepository : IGenresRepository
+    public class ActorsRepository : IActorsRepository
     {
         private readonly string _connectionString;
 
-        public GenresRepository(IConfiguration configuration)
+        public ActorsRepository(IConfiguration configuration)
         {
             _connectionString = configuration
-                .GetConnectionString("DefaultConnection")!;
+                 .GetConnectionString("DefaultConnection")!;
         }
-
-        public async Task<int> CreateAsync(Genre genre)
+        public async Task<int> CreateAsync(Actor actor)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var id = await connection.QuerySingleAsync<int>("Genres_Create",
-                    new {genre.Name}, commandType: CommandType.StoredProcedure);
-                
-                genre.Id = id;
+                var id = await connection.QuerySingleAsync<int>("Actors_Create",
+                    new { actor.Name, actor.DateOfBirth, actor.Picture },
+                    commandType: CommandType.StoredProcedure);
+
+                actor.Id = id;
                 return id;
             }
         }
@@ -32,7 +33,7 @@ namespace MinimalAPIsMovies.Repositories
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.ExecuteAsync("Genres_Delete",
+                await connection.ExecuteAsync("Actors", 
                     new { id }, commandType: CommandType.StoredProcedure);
             }
         }
@@ -41,21 +42,21 @@ namespace MinimalAPIsMovies.Repositories
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var exists = await connection.QuerySingleAsync<bool>("Genres_Exists",
+                var exists = await connection.QuerySingleAsync<bool>("Actors_Exists",
                     new { id }, commandType: CommandType.StoredProcedure);
 
                 return exists;
             }
         }
 
-        public async Task<List<Genre>> GetAllAsync()
+        public async Task<List<Actor>> GetAllAsync()
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var genres = await connection.QueryAsync<Genre>("Genres_GetAll",
+                var actors = await connection.QueryAsync<Actor>("Actors_GetAll",
                     commandType: CommandType.StoredProcedure);
 
-                return genres.ToList();
+                return actors.ToList();
             }
         }
 
@@ -63,19 +64,19 @@ namespace MinimalAPIsMovies.Repositories
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var genre = await connection.QueryFirstOrDefaultAsync<Genre>("Genres_GetById",
+                var genre = await connection.QueryFirstOrDefaultAsync<Genre>("Actors_GetById",
                     new {id}, commandType: CommandType.StoredProcedure);
 
                 return genre;
-            }            
+            }
         }
 
-        public async Task UpdateAsync(Genre genre)
+        public async Task UpdateAsync(Actor actor)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.ExecuteAsync("Genres_Update", 
-                    new {genre.Id, genre.Name}, 
+                await connection.ExecuteAsync("Actors_Update",
+                    new { actor.Name, actor.DateOfBirth, actor.Picture },
                     commandType: CommandType.StoredProcedure);
             }
         }
