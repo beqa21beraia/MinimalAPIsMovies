@@ -10,6 +10,7 @@
         "dependencies": {
           "AutoMapper": "12.0.1",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "12.0.1",
+          "Azure.Storage.Blobs": "12.27.0",
           "Dapper": "2.1.72",
           "Microsoft.Data.SqlClient": "6.1.4",
           "Swashbuckle.AspNetCore": "10.1.5"
@@ -64,6 +65,30 @@
           "lib/net8.0/Azure.Identity.dll": {
             "assemblyVersion": "1.17.1.0",
             "fileVersion": "1.1700.125.56903"
+          }
+        }
+      },
+      "Azure.Storage.Blobs/12.27.0": {
+        "dependencies": {
+          "Azure.Core": "1.50.0",
+          "Azure.Storage.Common": "12.26.0"
+        },
+        "runtime": {
+          "lib/net8.0/Azure.Storage.Blobs.dll": {
+            "assemblyVersion": "12.27.0.0",
+            "fileVersion": "12.2700.26.5804"
+          }
+        }
+      },
+      "Azure.Storage.Common/12.26.0": {
+        "dependencies": {
+          "Azure.Core": "1.50.0",
+          "System.IO.Hashing": "10.0.1"
+        },
+        "runtime": {
+          "lib/net8.0/Azure.Storage.Common.dll": {
+            "assemblyVersion": "12.26.0.0",
+            "fileVersion": "12.2600.26.5804"
           }
         }
       },
@@ -445,6 +470,14 @@
           }
         }
       },
+      "System.IO.Hashing/10.0.1": {
+        "runtime": {
+          "lib/net9.0/System.IO.Hashing.dll": {
+            "assemblyVersion": "10.0.0.1",
+            "fileVersion": "10.0.125.57005"
+          }
+        }
+      },
       "System.Memory.Data/8.0.1": {
         "runtime": {
           "lib/net8.0/System.Memory.Data.dll": {
@@ -514,6 +547,20 @@
       "sha512": "sha512-MSZkBrctcpiGxs9Cvr2VKKoN6qFLZlP3I6xuCWJ9iTgitI5Rgxtk5gfOSpXPZE3+CJmZ/mnqpQyGyjawFn5Vvg==",
       "path": "azure.identity/1.17.1",
       "hashPath": "azure.identity.1.17.1.nupkg.sha512"
+    },
+    "Azure.Storage.Blobs/12.27.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zI5rg1tTtnA8T2g2/21l+1iIUdDjpEQQ0FI1BabJVEQJ1JUyTQKrc41eNabAHs0SBHprl6pu/6OqIMK9Ve+4tQ==",
+      "path": "azure.storage.blobs/12.27.0",
+      "hashPath": "azure.storage.blobs.12.27.0.nupkg.sha512"
+    },
+    "Azure.Storage.Common/12.26.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-XaT6CDcSshZb7KaCTwc6m4EouZbLBg7ciOEpsJSdJCvkNsZJQCvPKw7V5TtXno19AA1NpwtsZriYque8mzbQVg==",
+      "path": "azure.storage.common/12.26.0",
+      "hashPath": "azure.storage.common.12.26.0.nupkg.sha512"
     },
     "Dapper/2.1.72": {
       "type": "package",
@@ -731,6 +778,13 @@
       "sha512": "sha512-rQkO1YbAjLwnDJSMpRhRtrc6XwIcEOcUvoEcge+evurpzSZM3UNK+MZfD3sKyTlYsvknZ6eJjSBfnmXqwOsT9Q==",
       "path": "system.identitymodel.tokens.jwt/7.7.1",
       "hashPath": "system.identitymodel.tokens.jwt.7.7.1.nupkg.sha512"
+    },
+    "System.IO.Hashing/10.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Dy6ULPb2S0GmNndjKrEIpfibNsc8+FTOoZnqygtFDuyun8vWboQbfMpQtKUXpgTxokR5E4zFHETpNnGfeWY6NA==",
+      "path": "system.io.hashing/10.0.1",
+      "hashPath": "system.io.hashing.10.0.1.nupkg.sha512"
     },
     "System.Memory.Data/8.0.1": {
       "type": "package",

@@ -1,5 +1,29 @@
 [
   {
+    "ContainingType": "MinimalAPIsMovies.Endpoints.ActorsEndpoints",
+    "Method": "CreateAsync",
+    "RelativePath": "actors/",
+    "HttpMethod": "POST",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createActorDTO",
+        "Type": "MinimalAPIsMovies.DTOs.CreateActorDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MinimalAPIsMovies.DTOs.ActorDTO",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 201
+      }
+    ]
+  },
+  {
     "ContainingType": "MinimalAPIsMovies.Endpoints.GenresEndpoints",
     "Method": "GetGenres",
     "RelativePath": "genres/",

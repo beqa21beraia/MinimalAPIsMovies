@@ -5,6 +5,39 @@
     "version": "1.0"
   },
   "paths": {
+    "/actors": {
+      "post": {
+        "tags": [
+          "ActorsEndpoints"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActorDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActorDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActorDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/genres": {
       "get": {
         "tags": [
@@ -148,6 +181,47 @@
   },
   "components": {
     "schemas": {
+      "ActorDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "picture": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateActorDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "picture": {
+            "type": "string",
+            "format": "binary",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateGenreDTO": {
         "type": "object",
         "properties": {
@@ -175,6 +249,9 @@
     }
   },
   "tags": [
+    {
+      "name": "ActorsEndpoints"
+    },
     {
       "name": "GenresEndpoints"
     }

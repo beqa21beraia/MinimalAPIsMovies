@@ -33,7 +33,7 @@ namespace MinimalAPIsMovies.Repositories
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.ExecuteAsync("Actors", 
+                await connection.ExecuteAsync("Actors_Delete", 
                     new { id }, commandType: CommandType.StoredProcedure);
             }
         }
@@ -60,14 +60,14 @@ namespace MinimalAPIsMovies.Repositories
             }
         }
 
-        public async Task<Genre?> GetByIdAsync(int id)
+        public async Task<Actor?> GetByIdAsync(int id)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var genre = await connection.QueryFirstOrDefaultAsync<Genre>("Actors_GetById",
+                var actor = await connection.QueryFirstOrDefaultAsync<Actor>("Actors_GetById",
                     new {id}, commandType: CommandType.StoredProcedure);
 
-                return genre;
+                return actor;
             }
         }
 
@@ -76,7 +76,7 @@ namespace MinimalAPIsMovies.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.ExecuteAsync("Actors_Update",
-                    new { actor.Name, actor.DateOfBirth, actor.Picture },
+                    new { actor.Id, actor.Name, actor.DateOfBirth, actor.Picture },
                     commandType: CommandType.StoredProcedure);
             }
         }

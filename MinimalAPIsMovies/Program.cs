@@ -6,12 +6,15 @@ using MinimalAPIsMovies.Endpoints;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using MinimalAPIsMovies.Repositories;
+using MinimalAPIsMovies.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Services zone - BEGIN
 
 builder.Services.AddScoped<IGenresRepository, GenresRepository>();
+builder.Services.AddScoped<IActorsRepository, ActorsRepository>();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(configuration =>
@@ -33,6 +36,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 
+builder.Services.AddTransient<IFileStorage, AzureFileStorage>();
+builder.Services.AddHttpContextAccessor();
+
 //Services zone - END
 
 var app = builder.Build();
@@ -41,10 +47,12 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseStaticFiles();
 app.UseCors();
 app.UseOutputCache();
 
 app.MapGroup("/genres").MapGenres();
+app.MapGroup("/actors").MapActors();
 
 //Middlewares zone - END
 

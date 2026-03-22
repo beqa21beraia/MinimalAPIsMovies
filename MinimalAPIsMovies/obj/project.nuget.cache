@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "k6KezP+unDA=",
+  "dgSpecHash": "1IPDJBNFqFg=",
   "success": true,
   "projectFilePath": "D:\\VS_Projects\\MinimalAPIsMovies\\MinimalAPIsMovies\\MinimalAPIsMovies.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,8 @@
     "C:\\Users\\user\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\azure.storage.blobs\\12.27.0\\azure.storage.blobs.12.27.0.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\azure.storage.common\\12.26.0\\azure.storage.common.12.26.0.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\dapper\\2.1.72\\dapper.2.1.72.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\8.0.0\\microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
@@ -39,6 +41,7 @@
     "C:\\Users\\user\\.nuget\\packages\\system.diagnostics.diagnosticsource\\9.0.11\\system.diagnostics.diagnosticsource.9.0.11.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\system.diagnostics.eventlog\\9.0.11\\system.diagnostics.eventlog.9.0.11.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\system.identitymodel.tokens.jwt\\7.7.1\\system.identitymodel.tokens.jwt.7.7.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\system.io.hashing\\10.0.1\\system.io.hashing.10.0.1.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\system.memory.data\\8.0.1\\system.memory.data.8.0.1.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\system.security.cryptography.pkcs\\9.0.11\\system.security.cryptography.pkcs.9.0.11.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.11\\system.security.cryptography.protecteddata.9.0.11.nupkg.sha512",

@@ -83,3 +83,6 @@ D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\runtimes\win
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\obj\Debug\net9.0\MinimalAPIsMovies.sourcelink.json
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\AutoMapper.dll
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\Azure.Storage.Blobs.dll
+D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\Azure.Storage.Common.dll
+D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\System.IO.Hashing.dll
