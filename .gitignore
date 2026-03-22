@@ -5,8 +5,8 @@
 MinimalAPIsMovies/appsettings.Development.json
 
 # Build results
-bin/
-obj/
+MinimalAPIsMovies/bin
+MinimalAPIsMovies/obj
 
 # User-specific files
 *.user
