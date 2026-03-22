@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
+using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using System.Data;
@@ -11,11 +12,13 @@ namespace MinimalAPIsMovies.Repositories
     public class ActorsRepository : IActorsRepository
     {
         private readonly string _connectionString;
+        private readonly HttpContext _httpContext;
 
-        public ActorsRepository(IConfiguration configuration)
+        public ActorsRepository(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _connectionString = configuration
                  .GetConnectionString("DefaultConnection")!;
+            _httpContext = httpContextAccessor.HttpContext!;
         }
         public async Task<int> CreateAsync(Actor actor)
         {
@@ -50,12 +53,18 @@ namespace MinimalAPIsMovies.Repositories
             }
         }
 
-        public async Task<List<Actor>> GetAllAsync()
+        public async Task<List<Actor>> GetAllAsync(PaginationDTO pagination)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 var actors = await connection.QueryAsync<Actor>("Actors_GetAll",
+                    new {pagination.Page, pagination.recordsPerPage},
                     commandType: CommandType.StoredProcedure);
+                
+                var actorsCount = await connection.QuerySingleAsync<int>("Actors_Count",
+                    commandType: CommandType.StoredProcedure);
+
+                _httpContext.Response.Headers.Append("totalAmountOfRecords", actorsCount.ToString());
 
                 return actors.ToList();
             }

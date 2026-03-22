@@ -23,9 +23,10 @@ namespace MinimalAPIsMovies.Endpoints
         }
         
         static async Task<Ok<List<ActorDTO>>> GetAllAsync(IActorsRepository repository,
-            IMapper mapper)
+            IMapper mapper, int page = 1, int recordsPerPage = 10)
         {
-            var actors = await repository.GetAllAsync();
+            var pagination = new PaginationDTO { Page = page, recordsPerPage = recordsPerPage };
+            var actors = await repository.GetAllAsync(pagination);
             var actorsDTO = mapper.Map<List<ActorDTO>>(actors);
             return TypedResults.Ok(actorsDTO);
         }
