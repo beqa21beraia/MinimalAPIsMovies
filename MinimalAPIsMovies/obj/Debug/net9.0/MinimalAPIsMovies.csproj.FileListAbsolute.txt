@@ -86,3 +86,4 @@ D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\AutoMapper.E
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\Azure.Storage.Blobs.dll
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\Azure.Storage.Common.dll
 D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\System.IO.Hashing.dll
+D:\VS_Projects\MinimalAPIsMovies\MinimalAPIsMovies\bin\Debug\net9.0\MinimalAPIsMovies.staticwebassets.runtime.json

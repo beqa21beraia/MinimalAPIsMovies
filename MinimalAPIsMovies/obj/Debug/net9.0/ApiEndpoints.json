@@ -1,6 +1,24 @@
 [
   {
     "ContainingType": "MinimalAPIsMovies.Endpoints.ActorsEndpoints",
+    "Method": "GetAllAsync",
+    "RelativePath": "actors/",
+    "HttpMethod": "GET",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[MinimalAPIsMovies.DTOs.ActorDTO, MinimalAPIsMovies, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "MinimalAPIsMovies.Endpoints.ActorsEndpoints",
     "Method": "CreateAsync",
     "RelativePath": "actors/",
     "HttpMethod": "POST",
@@ -20,6 +38,35 @@
           "application/json"
         ],
         "StatusCode": 201
+      }
+    ]
+  },
+  {
+    "ContainingType": "MinimalAPIsMovies.Endpoints.ActorsEndpoints",
+    "Method": "GetByIdAsync",
+    "RelativePath": "actors/{id:int}",
+    "HttpMethod": "GET",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MinimalAPIsMovies.DTOs.ActorDTO",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 404
       }
     ]
   },
