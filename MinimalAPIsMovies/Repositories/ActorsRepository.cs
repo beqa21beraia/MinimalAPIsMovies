@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using System.Data;
@@ -78,6 +79,17 @@ namespace MinimalAPIsMovies.Repositories
                 await connection.ExecuteAsync("Actors_Update",
                     new { actor.Id, actor.Name, actor.DateOfBirth, actor.Picture },
                     commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public async Task<List<Actor>> GetByNameAsync(string name)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var actors = await connection.QueryAsync<Actor>("Actors_GetByName",
+                    new { name }, commandType: CommandType.StoredProcedure);
+
+                return actors.ToList();
             }
         }
     }

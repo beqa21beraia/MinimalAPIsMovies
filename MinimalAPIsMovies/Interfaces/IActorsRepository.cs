@@ -10,5 +10,6 @@ namespace MinimalAPIsMovies.Interfaces
         Task<bool> ExistsAsync(int id);
         Task UpdateAsync(Actor actor);
         Task DeleteAsync(int id);
+        Task<List<Actor>> GetByNameAsync(string name);
     }
 }
