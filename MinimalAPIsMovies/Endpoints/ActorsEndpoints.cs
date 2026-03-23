@@ -6,6 +6,7 @@ using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using MinimalAPIsMovies.Services;
+using System.Runtime.InteropServices;
 
 namespace MinimalAPIsMovies.Endpoints
 {
@@ -19,6 +20,7 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapGet("/{id:int}", GetByIdAsync);
             group.MapGet("getByName/{name}", GetByNameAsync);
             group.MapPost("/", CreateAsync).DisableAntiforgery();
+            group.MapPut("/", UpdateAsync).DisableAntiforgery();
             return group;
         }
         
@@ -74,6 +76,33 @@ namespace MinimalAPIsMovies.Endpoints
             return TypedResults.Created($"actors/{id}", actorDTO);
         }
 
+        static async Task<Results<NoContent, NotFound>> UpdateAsync(int id,
+            [FromForm] CreateActorDTO createActorDTO, IActorsRepository actorsRepository,
+            IFileStorage fileStorage, IOutputCacheStore outputCacheStore,
+            IMapper mapper)
+        {
+            var actorDB = await actorsRepository.GetByIdAsync(id);
 
+            if (actorDB is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            var actorToUpdate = mapper.Map<Actor>(createActorDTO);
+            actorToUpdate.Id = id;
+            actorToUpdate.Picture = actorDB.Picture;
+
+            if (createActorDTO.Picture is not null)
+            {
+                var url = await fileStorage.EditAsync(actorToUpdate.Picture,
+                    container, createActorDTO.Picture);
+                actorToUpdate.Picture = url;
+            }
+
+            await actorsRepository.UpdateAsync(actorToUpdate);
+            await outputCacheStore.EvictByTagAsync("actors-get", default);
+
+            return TypedResults.NoContent();
+        }
     }
 }
