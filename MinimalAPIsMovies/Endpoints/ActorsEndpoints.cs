@@ -20,7 +20,8 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapGet("/{id:int}", GetByIdAsync);
             group.MapGet("getByName/{name}", GetByNameAsync);
             group.MapPost("/", CreateAsync).DisableAntiforgery();
-            group.MapPut("/", UpdateAsync).DisableAntiforgery();
+            group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery();
+            group.MapDelete("/{id:int}", DeleteAsync);
             return group;
         }
         
@@ -102,6 +103,27 @@ namespace MinimalAPIsMovies.Endpoints
             await actorsRepository.UpdateAsync(actorToUpdate);
             await outputCacheStore.EvictByTagAsync("actors-get", default);
 
+            return TypedResults.NoContent();
+        }
+
+        static async Task<Results<NoContent, NotFound>> DeleteAsync(int id,
+            IActorsRepository actorsRepository, IOutputCacheStore outputCacheStore,
+            IFileStorage fileStorage)
+        {
+            var actorDB = await actorsRepository.GetByIdAsync(id);
+
+            if (actorDB is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            if (actorDB.Picture is not null)
+            {
+                await fileStorage.DeleteAsync(actorDB.Picture, container);
+            }
+
+            await actorsRepository.DeleteAsync(id);
+            await outputCacheStore.EvictByTagAsync("actors-get", default);
             return TypedResults.NoContent();
         }
     }
