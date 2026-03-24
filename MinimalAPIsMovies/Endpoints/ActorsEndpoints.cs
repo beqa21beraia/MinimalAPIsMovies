@@ -12,7 +12,7 @@ namespace MinimalAPIsMovies.Endpoints
 {
     public static class ActorsEndpoints
     {
-        private readonly static string container = "actors";
+        private readonly static string _container = "actors";
         public static RouteGroupBuilder MapActors(this RouteGroupBuilder group)
         {
             group.MapGet("/", GetAllAsync)
@@ -65,13 +65,12 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (createActorDTO.Picture is not null)
             {
-                var url = await fileStorage.StoreAsync(container, createActorDTO.Picture);
+                var url = await fileStorage.StoreAsync(_container, createActorDTO.Picture);
                 actor.Picture = url;
             }
 
             var id = await actorsRepository.CreateAsync(actor);
             await outputCacheStore.EvictByTagAsync("actors-get", default);
-
             var actorDTO = mapper.Map<ActorDTO>(actor);
 
             return TypedResults.Created($"actors/{id}", actorDTO);
@@ -96,7 +95,7 @@ namespace MinimalAPIsMovies.Endpoints
             if (createActorDTO.Picture is not null)
             {
                 var url = await fileStorage.EditAsync(actorToUpdate.Picture,
-                    container, createActorDTO.Picture);
+                    _container, createActorDTO.Picture);
                 actorToUpdate.Picture = url;
             }
 
@@ -119,7 +118,7 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (actorDB.Picture is not null)
             {
-                await fileStorage.DeleteAsync(actorDB.Picture, container);
+                await fileStorage.DeleteAsync(actorDB.Picture, _container);
             }
 
             await actorsRepository.DeleteAsync(id);
