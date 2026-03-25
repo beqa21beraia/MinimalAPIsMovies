@@ -20,6 +20,7 @@ namespace MinimalAPIsMovies.Endpoints
                 .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("movies-get"));
             group.MapGet("/{id:int}", GetByIdAsync);
             group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery();
+            group.MapDelete("/{id:int}", DeleteAsync);
             return group;
         }
 
@@ -93,5 +94,27 @@ namespace MinimalAPIsMovies.Endpoints
 
             return TypedResults.NoContent();
         }
-    }
+
+        static async Task<Results<NoContent, NotFound>> DeleteAsync(int id,
+            IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore,
+            IFileStorage fileStorage)
+        {
+            var movieDB = await moviesRepository.GetByIdAsync(id);
+
+            if (movieDB is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            if (movieDB.Poster is not null)
+            {
+                await fileStorage.DeleteAsync(movieDB.Poster, _container);
+            }
+
+            await moviesRepository.DeleteAsync(id);
+            await outputCacheStore.EvictByTagAsync("movies-get", default);
+
+            return TypedResults.NoContent();
+        }
+    } 
 }

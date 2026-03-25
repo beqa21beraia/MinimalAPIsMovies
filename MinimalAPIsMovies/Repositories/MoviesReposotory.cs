@@ -37,7 +37,7 @@ namespace MinimalAPIsMovies.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.ExecuteAsync("Movies_Delete",
-                    commandType: CommandType.StoredProcedure);
+                    new { id }, commandType: CommandType.StoredProcedure);
             }
         }
 
