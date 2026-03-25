@@ -19,6 +19,7 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("movies-get"));
             group.MapGet("/{id:int}", GetByIdAsync);
+            group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery();
             return group;
         }
 
@@ -62,6 +63,35 @@ namespace MinimalAPIsMovies.Endpoints
 
             var movieDTO = mapper.Map<MovieDTO>(movie);
             return TypedResults.Ok(movieDTO);
+        }
+
+        static async Task<Results<NoContent, NotFound>> UpdateAsync(int id,
+            [FromForm] CreateMovieDTO createMovieDTO, IMoviesRepository moviesRepository,
+            IFileStorage fileStorage, IOutputCacheStore outputCacheStore, 
+            IMapper mapper)
+        {
+            var movieDB = await moviesRepository.GetByIdAsync(id);
+
+            if (movieDB is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            var movieToUpdate = mapper.Map<Movie>(createMovieDTO);
+            movieToUpdate.Id = id;
+            movieToUpdate.Poster = movieDB.Poster;
+
+            if (createMovieDTO.Poster is not null)
+            {
+                var url = await fileStorage.EditAsync(movieToUpdate.Poster,
+                    _container, createMovieDTO.Poster);
+                movieToUpdate.Poster = url;
+            }
+
+            await moviesRepository.UpdateAsync(movieToUpdate);
+            await outputCacheStore.EvictByTagAsync("movies-get", default);
+
+            return TypedResults.NoContent();
         }
     }
 }
