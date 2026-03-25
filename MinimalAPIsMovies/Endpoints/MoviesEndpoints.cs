@@ -16,6 +16,9 @@ namespace MinimalAPIsMovies.Endpoints
         public static RouteGroupBuilder MapMovies(this RouteGroupBuilder group)
         {
             group.MapPost("/", CreateAsync).DisableAntiforgery();
+            group.MapGet("/", GetAllAsync)
+                .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("movies-get"));
+            group.MapGet("/{id:int}", GetByIdAsync);
             return group;
         }
 
@@ -36,6 +39,29 @@ namespace MinimalAPIsMovies.Endpoints
             var movieDTO = mapper.Map<MovieDTO>(movie);
 
             return TypedResults.Created($"movies/{id}", movieDTO);
+        }
+
+        static async Task<Ok<List<MovieDTO>>> GetAllAsync(IMoviesRepository moviesRepository,
+            IMapper mapper, int page = 1, int recordsPerPage = 10)
+        {
+            var pagination = new PaginationDTO { Page = page, RecordsPerPage = recordsPerPage };
+            var movies = await moviesRepository.GetAllAsync(pagination);
+            var moviesDTO = mapper.Map<List<MovieDTO>>(movies);
+            return TypedResults.Ok(moviesDTO);
+        }
+
+        static async Task<Results<Ok<MovieDTO>, NotFound>> GetByIdAsync(int id, 
+            IMoviesRepository moviesRepository, IMapper mapper)
+        {
+            var movie = await moviesRepository.GetByIdAsync(id);
+                
+            if (movie is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            var movieDTO = mapper.Map<MovieDTO>(movie);
+            return TypedResults.Ok(movieDTO);
         }
     }
 }
