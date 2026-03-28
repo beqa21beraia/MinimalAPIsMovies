@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
+using System.ClientModel.Primitives;
 
 namespace MinimalAPIsMovies.Endpoints
 {
@@ -14,7 +15,9 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapPost("/", CreateAsync);
             group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("comments-get"));
-            group.MapGet("/{id:int}", GetByIdAsync).WithName("GetCommentById");
+            group.MapGet("/{commentId:int}", GetByIdAsync).WithName("GetCommentById");
+            group.MapPut("/{commentId:int}", UpdateAsync);
+            group.MapDelete("/{commentId:int}", DeleteAsync);
             return group;
         }
 
@@ -51,8 +54,8 @@ namespace MinimalAPIsMovies.Endpoints
 
             return TypedResults.Ok(commentsDTO);
         }
-
-        static async Task<Results<Ok<CommentDTO>, NotFound>> GetByIdAsync(int movieId, int id,
+        
+        static async Task<Results<Ok<CommentDTO>, NotFound>> GetByIdAsync(int movieId, int commentId,
             ICommentsRepository commentsRepository, IMoviesRepository moviesRepository,
             IMapper mapper)
         {
@@ -61,7 +64,7 @@ namespace MinimalAPIsMovies.Endpoints
                 return TypedResults.NotFound();
             }
 
-            var comment = await commentsRepository.GetByIdAsync(id);
+            var comment = await commentsRepository.GetByIdAsync(commentId);
 
             if (comment is null)
             {
@@ -72,5 +75,49 @@ namespace MinimalAPIsMovies.Endpoints
 
             return TypedResults.Ok(commentDTO);
         } 
+
+        static async Task<Results<NoContent, NotFound>> UpdateAsync(int movieId, int commentId,
+            CreateCommentDTO createCommentDTO, ICommentsRepository commentsRepository, 
+            IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore, IMapper mapper)
+        {
+            if (!await moviesRepository.ExistsAsync(movieId))
+            {
+                return TypedResults.NotFound();
+            }
+
+            if (!await commentsRepository.ExistsAsync(commentId))
+            {
+                return TypedResults.NotFound();
+            }
+            
+            var comment = mapper.Map<Comment>(createCommentDTO);
+            comment.Id = commentId;
+            comment.MovieId = movieId;
+            
+            await commentsRepository.UpdateAsync(comment);
+            await outputCacheStore.EvictByTagAsync("comments-get", default);
+            
+            return TypedResults.NoContent();
+        }
+
+        static async Task<Results<NoContent, NotFound>> DeleteAsync(int movieId, int commentId,
+            ICommentsRepository commentsRepository, IMoviesRepository moviesRepository,
+            IOutputCacheStore outputCacheStore)
+        {
+            if (!await moviesRepository.ExistsAsync(movieId))
+            {
+                return TypedResults.NotFound();
+            }
+
+            if (!await commentsRepository.ExistsAsync(commentId))
+            {
+                return TypedResults.NotFound();
+            }
+
+            await commentsRepository.DeleteAsync(commentId);
+            await outputCacheStore.EvictByTagAsync("comments-get", default);
+                
+            return TypedResults.NoContent();
+        }
     }
 }
