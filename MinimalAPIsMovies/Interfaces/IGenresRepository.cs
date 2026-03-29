@@ -10,5 +10,6 @@ namespace MinimalAPIsMovies.Interfaces
         Task<bool> ExistsAsync(int id);
         Task UpdateAsync(Genre genre);
         Task DeleteAsync(int id);
+        Task<List<int>> ExistsAsync(List<int> genresIds);
     }
 }

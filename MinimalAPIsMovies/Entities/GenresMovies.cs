@@ -7,4 +7,4 @@
         public Movie Movie { get; set; } = null!;
         public Genre Genre { get; set; } = null!;
     }
-}
+}   
