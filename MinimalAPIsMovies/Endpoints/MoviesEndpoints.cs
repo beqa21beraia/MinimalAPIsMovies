@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Identity.Client;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
@@ -22,6 +23,7 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery();
             group.MapDelete("/{id:int}", DeleteAsync);
             group.MapPost("/{id:int}/assignGenres", AssignGenresAsync);
+            group.MapPost("/{id:int}/assignActors", AssignActorsAsync);
             return group;
         }
 
@@ -139,10 +141,42 @@ namespace MinimalAPIsMovies.Endpoints
                 var nonExistingGenreIds = genresIds.Except(existingGenreIds);
                 var nonExistingGenreIdsCSV = string.Join(",", nonExistingGenreIds);
 
-                return TypedResults.BadRequest($"The genres of Id {nonExistingGenreIdsCSV} does not exists");
+                return TypedResults
+                    .BadRequest($"The genres of Id {nonExistingGenreIdsCSV} does not exists");
             }
 
             await moviesRepository.AssignAsync(id, genresIds);
+            return TypedResults.NoContent();
+        }
+
+        static async Task<Results<NoContent, NotFound, BadRequest<string>>> AssignActorsAsync(
+            int id, List<AssignActorMovieDTO> actorsDTO, IMoviesRepository moviesRepository, 
+            IActorsRepository actorsRepository, IMapper mapper)
+        {
+            if (!await moviesRepository.ExistsAsync(id))
+            {
+                return TypedResults.NotFound();
+            }
+
+            var existingActors = new List<int>();
+            var actorsIDs = actorsDTO.Select(a => a.ActorId).ToList();
+
+            if (actorsDTO.Count != 0)
+            {
+                existingActors = await actorsRepository.ExistsAsync(actorsIDs);
+            }
+
+            if (existingActors.Count != actorsDTO.Count)
+            {
+                var nonExistingActors = actorsIDs.Except(existingActors);
+                var nonExistingActorsCSV = string.Join(",", nonExistingActors);
+                return TypedResults
+                    .BadRequest($"The actors with Id {nonExistingActorsCSV} does not exists");
+            }
+
+            var actors = mapper.Map<List<ActorMovie>>(actorsDTO);
+            await moviesRepository.AssignAsync(id, actors);
+            
             return TypedResults.NoContent();
         }
     } 

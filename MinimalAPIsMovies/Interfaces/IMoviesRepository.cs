@@ -12,5 +12,6 @@ namespace MinimalAPIsMovies.Interfaces
         Task UpdateAsync(Movie movie);
         Task DeleteAsync(int id);
         Task AssignAsync(int id, List<int> genresIds);
+        Task AssignAsync(int id, List<ActorMovie> actors);
     }
 }

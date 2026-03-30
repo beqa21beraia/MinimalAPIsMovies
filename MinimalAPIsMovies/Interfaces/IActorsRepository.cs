@@ -9,6 +9,7 @@ namespace MinimalAPIsMovies.Interfaces
         Task<List<Actor>> GetAllAsync(PaginationDTO paginationDTO);
         Task<Actor?> GetByIdAsync(int id);
         Task<bool> ExistsAsync(int id);
+        Task<List<int>> ExistsAsync(List<int> ids);
         Task UpdateAsync(Actor actor);
         Task DeleteAsync(int id);
         Task<List<Actor>> GetByNameAsync(string name);

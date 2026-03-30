@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
@@ -50,6 +51,24 @@ namespace MinimalAPIsMovies.Repositories
                     new { id }, commandType: CommandType.StoredProcedure);
 
                 return exists;
+            }
+        }
+
+        public async Task<List<int>> ExistsAsync(List<int> ids)
+        {
+            var dt = new DataTable();
+            dt.Columns.Add("Id", typeof(int));
+
+            foreach( var id in ids)
+            {
+                dt.Rows.Add(id);
+            }
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var idsOfExistingActors = await connection.QueryAsync<int>("Actors_GetBySeveralIds",
+                    new { actorsIds = dt }, commandType: CommandType.StoredProcedure);
+                return idsOfExistingActors.ToList();
             }
         }
 
