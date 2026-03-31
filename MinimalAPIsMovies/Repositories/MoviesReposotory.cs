@@ -4,6 +4,7 @@ using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using System.Data;
+using System.Diagnostics;
 using System.Security.AccessControl;
 
 namespace MinimalAPIsMovies.Repositories
@@ -78,8 +79,30 @@ namespace MinimalAPIsMovies.Repositories
                 {
                     var movie = await multi.ReadFirstAsync<Movie>();
                     var comments = await multi.ReadAsync<Comment>();
+                    var genres = await multi.ReadAsync<Genre>();
+                    var actors = await multi.ReadAsync<ActorMovieDTO>();
 
                     movie.Comments = comments.ToList();
+
+                    foreach (var genre in genres)
+                    {
+                        movie.GenresMovies.Add(new GenresMovies
+                        {
+                            GenreId = genre.Id,
+                            Genre = genre
+                        });
+                    }
+
+                    foreach (var actor in actors)
+                    {
+                        movie.ActorMovies.Add(new ActorMovie
+                        {
+                            ActorId = actor.Id,
+                            Character = actor.Character,
+                            Actor = new Actor { Name = actor.Name }
+
+                        });
+                    }
 
                     return movie;
                 }
