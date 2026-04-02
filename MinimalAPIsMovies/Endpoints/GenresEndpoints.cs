@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MinimalAPIsMovies.DTOs;
@@ -47,10 +48,17 @@ namespace MinimalAPIsMovies.Endpoints
             return TypedResults.Ok(genreDTO);
         }
 
-        static async Task<Created<GenreDTO>> Create(CreateGenreDTO createGenreDTO, 
+        static async Task<Results<Created<GenreDTO>, ValidationProblem>> Create(CreateGenreDTO createGenreDTO, 
             IGenresRepository genresRepository,IOutputCacheStore outputCacheStore,
-            IMapper mapper)
+            IMapper mapper, IValidator<CreateGenreDTO> validator)
         {
+            var validationResults = await validator.ValidateAsync(createGenreDTO);
+
+            if (!validationResults.IsValid)
+            {
+                return TypedResults.ValidationProblem(validationResults.ToDictionary());
+            }
+
             var genre = mapper.Map<Genre>(createGenreDTO);
 
             var id = await genresRepository.CreateAsync(genre);

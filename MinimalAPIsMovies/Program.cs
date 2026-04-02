@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 //Services zone - BEGIN
 
 builder.Services.AddScoped<IGenresRepository, GenresRepository>();
+
 builder.Services.AddScoped<IActorsRepository, ActorsRepository>();
 builder.Services.AddScoped<IMoviesRepository, MoviesReposotory>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
@@ -41,8 +43,10 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddTransient<IFileStorage, AzureFileStorage>();
 builder.Services.AddHttpContextAccessor();
 
-//Services zone - END
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+//Services zone - END
+builder.Services.AddMvc();
 var app = builder.Build();
 
 //Middlewares zone - BEGIN
