@@ -21,27 +21,16 @@ namespace MinimalAPIsMovies.Validations
 
             RuleFor(p => p.Name)
                 .NotEmpty()
-                    .WithMessage("The field {PropertyName} is required")
+                    .WithMessage(ValidationUtilities.NonEmptyMessage)
                 .MaximumLength(150)
-                    .WithMessage("The field {PropertyName} should be less that {MaxLength} characters")
-                .Must(FirstLetterIsUppercase)
-                    .WithMessage("The field {PropertyName} should start with uppercase")
+                    .WithMessage(ValidationUtilities.MaximumLengthMessage)
+                .Must(ValidationUtilities.FirstLetterIsUppercase)
+                    .WithMessage(ValidationUtilities.FirstLetterIsUppercaseMessage)
                 .MustAsync(async (name, _) =>
                 {
                     var exists = await genresRepository.ExistsAsync(id, name);
                     return !exists;
                 }).WithMessage(g => $"A genre with the name {g.Name} already exists");
-        }
-
-        private bool FirstLetterIsUppercase(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return true;
-            }
-
-            var firstLetter = value[0].ToString();
-            return firstLetter == firstLetter.ToUpper();
         }
     }
 }
