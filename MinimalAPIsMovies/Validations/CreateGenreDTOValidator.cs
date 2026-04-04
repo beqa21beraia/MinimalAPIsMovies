@@ -19,7 +19,7 @@ namespace MinimalAPIsMovies.Validations
                 int.TryParse(routeValueIdString, out id);
             }
 
-            RuleFor(p => p.Name)
+            RuleFor(p => p.Name)    
                 .NotEmpty()
                     .WithMessage(ValidationUtilities.NonEmptyMessage)
                 .MaximumLength(150)
