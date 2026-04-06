@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Identity.Client;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
+using MinimalAPIsMovies.Filters;
 using MinimalAPIsMovies.Interfaces;
 using MinimalAPIsMovies.Services;
 using System.Security.Cryptography;
@@ -16,11 +17,13 @@ namespace MinimalAPIsMovies.Endpoints
         private readonly static string _container = "movies";
         public static RouteGroupBuilder MapMovies(this RouteGroupBuilder group)
         {
-            group.MapPost("/", CreateAsync).DisableAntiforgery();
             group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("movies-get"));
             group.MapGet("/{id:int}", GetByIdAsync);
-            group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery();
+            group.MapPost("/", CreateAsync).DisableAntiforgery()
+                .AddEndpointFilter<ValidationFilter<CreateMovieDTO>>();
+            group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery()
+                .AddEndpointFilter<ValidationFilter<CreateMovieDTO>>();
             group.MapDelete("/{id:int}", DeleteAsync);
             group.MapPost("/{id:int}/assignGenres", AssignGenresAsync);
             group.MapPost("/{id:int}/assignActors", AssignActorsAsync);
