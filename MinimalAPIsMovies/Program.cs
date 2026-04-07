@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 //Services zone - BEGIN
 
 builder.Services.AddScoped<IGenresRepository, GenresRepository>();
-
 builder.Services.AddScoped<IActorsRepository, ActorsRepository>();
 builder.Services.AddScoped<IMoviesRepository, MoviesReposotory>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
+builder.Services.AddScoped<IErrorsRepository, ErrorsRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -55,7 +56,28 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseExceptionHandler();
+
+app.UseExceptionHandler(exceptionHandlerApp => exceptionHandlerApp.Run(async context =>
+{
+    var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+    var exception = exceptionHandlerFeature?.Error!;
+
+    var error = new Error();
+    error.Date = DateTime.UtcNow;
+    error.ErrorMessage = exception.Message;
+    error.StackTrace = exception.StackTrace;
+
+    var repository = context.RequestServices.GetRequiredService<IErrorsRepository>();
+    await repository.CreateAsync(error);
+
+    await Results.BadRequest(new
+    {
+        type = "error",
+        message = "an unexpected exception has occurred",
+        status = 500
+    }).ExecuteAsync(context);
+}));
+
 app.UseStatusCodePages();
 app.UseStaticFiles();
 app.UseCors();
