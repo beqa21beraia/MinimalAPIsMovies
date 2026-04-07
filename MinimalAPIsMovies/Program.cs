@@ -45,6 +45,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+builder.Services.AddProblemDetails();
+
 //Services zone - END
 builder.Services.AddMvc();
 var app = builder.Build();
@@ -53,6 +55,8 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 app.UseStaticFiles();
 app.UseCors();
 app.UseOutputCache();
