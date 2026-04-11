@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -14,11 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Services zone - BEGIN
 
+builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
+builder.Services.AddIdentityCore<IdentityUser>();
+builder.Services.AddTransient<SignInManager<IdentityUser>>();
+
 builder.Services.AddScoped<IGenresRepository, GenresRepository>();
 builder.Services.AddScoped<IActorsRepository, ActorsRepository>();
 builder.Services.AddScoped<IMoviesRepository, MoviesReposotory>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 builder.Services.AddScoped<IErrorsRepository, ErrorsRepository>();
+builder.Services.AddScoped<IUsersRepository,  UsersRepository>();
 
 builder.Services.AddCors(options =>
 {
