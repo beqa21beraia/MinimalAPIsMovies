@@ -48,6 +48,9 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddProblemDetails();
 
+builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddAuthorization(); 
+
 //Services zone - END
 builder.Services.AddMvc();
 var app = builder.Build();
@@ -82,6 +85,7 @@ app.UseStatusCodePages();
 app.UseStaticFiles();
 app.UseCors();
 app.UseOutputCache();
+app.UseAuthorization();
 
 app.MapGroup("/genres").MapGenres();
 app.MapGroup("/actors").MapActors();
