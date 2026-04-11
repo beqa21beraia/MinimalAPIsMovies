@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MinimalAPIsMovies.Interfaces;
 using System.Data;
 
 namespace MinimalAPIsMovies.Repositories

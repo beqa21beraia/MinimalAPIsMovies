@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using MinimalAPIsMovies.Interfaces;
 
 namespace MinimalAPIsMovies.Services
@@ -45,7 +46,7 @@ namespace MinimalAPIsMovies.Services
 
         public Task<string?> GetEmailAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.Email);
         }
 
         public Task<bool> GetEmailConfirmedAsync(IdentityUser user, CancellationToken cancellationToken)
@@ -55,7 +56,7 @@ namespace MinimalAPIsMovies.Services
 
         public Task<string?> GetNormalizedEmailAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.NormalizedEmail);
         }
 
         public Task<string?> GetNormalizedUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
@@ -65,17 +66,17 @@ namespace MinimalAPIsMovies.Services
 
         public Task<string?> GetPasswordHashAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.PasswordHash);
         }
 
         public Task<string> GetUserIdAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.Id.ToString());
         }
 
         public Task<string?> GetUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.Email);
         }
 
         public Task<bool> HasPasswordAsync(IdentityUser user, CancellationToken cancellationToken)
@@ -95,17 +96,20 @@ namespace MinimalAPIsMovies.Services
 
         public Task SetNormalizedEmailAsync(IdentityUser user, string? normalizedEmail, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.NormalizedEmail = normalizedEmail;
+            return Task.CompletedTask;
         }
 
         public Task SetNormalizedUserNameAsync(IdentityUser user, string? normalizedName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.NormalizedUserName = normalizedName;
+            return Task.CompletedTask;
         }
 
         public Task SetPasswordHashAsync(IdentityUser user, string? passwordHash, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.PasswordHash = passwordHash;
+            return Task.CompletedTask;
         }
 
         public Task SetUserNameAsync(IdentityUser user, string? userName, CancellationToken cancellationToken)
