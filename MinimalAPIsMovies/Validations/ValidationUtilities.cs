@@ -5,7 +5,7 @@
         public static string NonEmptyMessage = "The field {PropertyName} is required";
         public static string MaximumLengthMessage = "The field {PropertyName} should be less that {MaxLength} characters";
         public static string FirstLetterIsUppercaseMessage = "The field {PropertyName} should start with uppercase";
-        internal static string EmailAddressMessage;
+        public static string EmailAddressMessage = "The field {PropertyName} is not a valid email address";
 
         public static string GreaterThanDate(DateTime value) =>
             "The field {PropertyName} should be greater than " + value.ToString("yyyy-MM-dd");
