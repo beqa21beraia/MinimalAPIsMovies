@@ -24,7 +24,7 @@ namespace MinimalAPIsMovies.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 var id = await connection.QuerySingleAsync<int>("Comments_Create",
-                    new { comment.Body, comment.MovieId }, commandType: CommandType.StoredProcedure);
+                    new { comment.Body, comment.MovieId, comment.UserId }, commandType: CommandType.StoredProcedure);
                 comment.Id = id;
 
                 return id;
