@@ -109,6 +109,7 @@ app.MapGroup("/genres").MapGenres();
 app.MapGroup("/actors").MapActors();
 app.MapGroup("/movies").MapMovies();
 app.MapGroup("/movie/{movieId:int}/comments").MapComments();
+app.MapGroup("/users").MapUsers();
 
 //Middlewares zone - END
 

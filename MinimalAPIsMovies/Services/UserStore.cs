@@ -56,7 +56,7 @@ namespace MinimalAPIsMovies.Services
 
         public Task<string?> GetNormalizedEmailAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.NormalizedEmail);
+            return Task.FromResult(user.NormalizedEmail);   
         }
 
         public Task<string?> GetNormalizedUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
