@@ -1,4 +1,4 @@
-﻿namespace MinimalAPIsMovies.Services
+﻿namespace MinimalAPIsMovies.Interfaces
 {
     public interface IFileStorage
     {

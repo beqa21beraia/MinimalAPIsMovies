@@ -1,4 +1,6 @@
 ﻿
+using MinimalAPIsMovies.Interfaces;
+
 namespace MinimalAPIsMovies.Services
 {
     public class LocalFileStorage(IWebHostEnvironment env,

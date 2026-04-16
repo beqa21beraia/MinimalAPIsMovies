@@ -7,7 +7,6 @@ using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Filters;
 using MinimalAPIsMovies.Interfaces;
-using MinimalAPIsMovies.Services;
 using System.Runtime.InteropServices;
 
 namespace MinimalAPIsMovies.Endpoints
