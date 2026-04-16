@@ -5,6 +5,7 @@ using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Filters;
 using MinimalAPIsMovies.Interfaces;
+using MinimalAPIsMovies.Services;
 using System.ClientModel.Primitives;
 
 namespace MinimalAPIsMovies.Endpoints
@@ -19,8 +20,10 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapPost("/", CreateAsync)
                 .AddEndpointFilter<ValidationFilter<CreateCommentDTO>>()
                 .RequireAuthorization();
-            group.MapPut("/{id:int}", UpdateAsync).AddEndpointFilter<ValidationFilter<CreateCommentDTO>>();
-            group.MapDelete("/{id:int}", DeleteAsync);
+            group.MapPut("/{id:int}", UpdateAsync)
+                .AddEndpointFilter<ValidationFilter<CreateCommentDTO>>()
+                .RequireAuthorization();
+            group.MapDelete("/{id:int}", DeleteAsync).RequireAuthorization();
             return group;
         }
 
@@ -87,45 +90,72 @@ namespace MinimalAPIsMovies.Endpoints
             return TypedResults.Ok(commentDTO);
         } 
 
-        static async Task<Results<NoContent, NotFound>> UpdateAsync(int movieId, int commentId,
+        static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateAsync(int movieId, int id,
             CreateCommentDTO createCommentDTO, ICommentsRepository commentsRepository, 
-            IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore, IMapper mapper)
+            IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore, IMapper mapper,
+            IUsersService usersService)
         {
             if (!await moviesRepository.ExistsAsync(movieId))
             {
                 return TypedResults.NotFound();
             }
 
-            if (!await commentsRepository.ExistsAsync(commentId))
+            var commentFromDB = await commentsRepository.GetByIdAsync(id);
+
+            if (commentFromDB is null)
             {
                 return TypedResults.NotFound();
             }
+
+            var user = await usersService.GetUserAsync();
+
+            if (user is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            if (commentFromDB.UserId != user.Id)
+            {
+                return TypedResults.Forbid();
+            }
             
-            var comment = mapper.Map<Comment>(createCommentDTO);
-            comment.Id = commentId;
-            comment.MovieId = movieId;
+            commentFromDB.Body = createCommentDTO.Body;
             
-            await commentsRepository.UpdateAsync(comment);
+            await commentsRepository.UpdateAsync(commentFromDB);
             await outputCacheStore.EvictByTagAsync("comments-get", default);
             
             return TypedResults.NoContent();
         }
 
-        static async Task<Results<NoContent, NotFound>> DeleteAsync(int movieId, int commentId,
+        static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteAsync(int movieId, int id,
             ICommentsRepository commentsRepository, IMoviesRepository moviesRepository,
-            IOutputCacheStore outputCacheStore)
+            IOutputCacheStore outputCacheStore, IUsersService usersService)
         {
             if (!await moviesRepository.ExistsAsync(movieId))
             {
                 return TypedResults.NotFound();
             }
 
-            if (!await commentsRepository.ExistsAsync(commentId))
+            var commentFromDB = await commentsRepository.GetByIdAsync(id);
+
+            if (commentFromDB is null)
             {
                 return TypedResults.NotFound();
             }
 
-            await commentsRepository.DeleteAsync(commentId);
+            var user = await usersService.GetUserAsync();
+
+            if (user is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            if (commentFromDB.UserId != user.Id)
+            {
+                return TypedResults.Forbid();
+            }
+
+            await commentsRepository.DeleteAsync(id);
             await outputCacheStore.EvictByTagAsync("comments-get", default);
                 
             return TypedResults.NoContent();
