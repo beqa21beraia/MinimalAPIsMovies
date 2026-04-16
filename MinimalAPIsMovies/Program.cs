@@ -51,12 +51,16 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddTransient<IFileStorage, AzureFileStorage>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<IUsersService, UsersService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddAuthentication().AddJwtBearer(options => 
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.MapInboundClaims = false;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -66,7 +70,8 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
         ClockSkew = TimeSpan.Zero,
         IssuerSigningKeys = KeysHandler.GetAllKeys(builder.Configuration)
         //IssuerSigningKey = KeysHandler.GetKey(builder.Configuration).First()
-    });
+    };
+});
 builder.Services.AddAuthorization(); 
 
 //Services zone - END
