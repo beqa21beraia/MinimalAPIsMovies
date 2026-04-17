@@ -6,6 +6,7 @@ using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Filters;
+using MinimalAPIsMovies.Interfaces;
 using MinimalAPIsMovies.Utilities;
 using MinimalAPIsMovies.Validations;
 using System.Collections.Generic;
@@ -30,6 +31,8 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapPost("/removeadmin", RemoveAdmin)
                 .AddEndpointFilter<ValidationFilter<EditClaimDTO>>()
                 .RequireAuthorization("isadmin");
+
+            group.MapGet("/renewtoken", Renew).RequireAuthorization();
             return group;
         }
 
@@ -107,6 +110,22 @@ namespace MinimalAPIsMovies.Endpoints
 
             await userManager.RemoveClaimAsync(user, new Claim("isadmin", "true"));
             return TypedResults.NoContent();
+        }
+
+        private static async Task<Results<Ok<AuthenticationResponseDTO>, NotFound>> Renew(
+            IUsersService usersService, IConfiguration configuration,
+            [FromServices] UserManager<IdentityUser> userManager)
+        {
+            var user = await usersService.GetUserAsync();
+
+            if (user is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            var userCredentials = new UserCredentialsDTO { Email = user.Email! };
+            var response = await BuildToken(userCredentials, userManager, configuration);
+            return TypedResults.Ok(response);
         }
 
         private async static Task<AuthenticationResponseDTO> BuildToken(
