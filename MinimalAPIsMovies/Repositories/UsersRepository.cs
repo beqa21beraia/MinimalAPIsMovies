@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MinimalAPIsMovies.Interfaces;
 using System.Data;
+using System.Security.Claims;
 
 namespace MinimalAPIsMovies.Repositories
 {
@@ -41,6 +42,40 @@ namespace MinimalAPIsMovies.Repositories
                 }, commandType: CommandType.StoredProcedure);
 
                 return user.Id;
+            }
+        }
+
+        public async Task<IList<Claim>> GetClaimsAsync(IdentityUser identityUser)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var claims = await connection.QueryAsync<Claim>("Users_GetClaims",
+                    new { identityUser.Id }, commandType: CommandType.StoredProcedure);
+                return claims.ToList();
+            }
+        }
+
+        public async Task AssignClaimsAsync(IdentityUser identityUser, IEnumerable<Claim> claims)
+        {
+            var sql = @"INSERT INTO UsersC1aims (UserId, ClaimType, ClaimValue)
+                        VALUES (@Id, @Type, @Value)";
+            var parameters = claims.Select(c => new { identityUser.Id, c.Type, c.Value });
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync(sql, parameters);
+            }
+        }
+
+        public async Task RemoveClaimsAsync(IdentityUser identityUser, IEnumerable<Claim> claims)
+        {
+            var sql = @"DELETE UsersC1aims
+                        WHERE UserId = @Id AND ClaimType = @Type";
+            var parameters = claims.Select(c => new { identityUser.Id, c.Type });
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync(sql, parameters);
             }
         }
     }

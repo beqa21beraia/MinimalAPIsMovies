@@ -19,13 +19,20 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("movies-get"));
             group.MapGet("/{id:int}", GetByIdAsync);
-            group.MapPost("/", CreateAsync).DisableAntiforgery()
-                .AddEndpointFilter<ValidationFilter<CreateMovieDTO>>();
-            group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery()
-                .AddEndpointFilter<ValidationFilter<CreateMovieDTO>>();
-            group.MapDelete("/{id:int}", DeleteAsync);
-            group.MapPost("/{id:int}/assignGenres", AssignGenresAsync);
-            group.MapPost("/{id:int}/assignActors", AssignActorsAsync);
+
+            group.MapPost("/", CreateAsync)
+                .DisableAntiforgery()
+                .AddEndpointFilter<ValidationFilter<CreateMovieDTO>>()
+                .RequireAuthorization("isadmin");
+
+            group.MapPut("/{id:int}", UpdateAsync)
+                .DisableAntiforgery()
+                .AddEndpointFilter<ValidationFilter<CreateMovieDTO>>()
+                .RequireAuthorization("isadmin");
+
+            group.MapDelete("/{id:int}", DeleteAsync).RequireAuthorization("isadmin");
+            group.MapPost("/{id:int}/assignGenres", AssignGenresAsync).RequireAuthorization("isadmin");
+            group.MapPost("/{id:int}/assignActors", AssignActorsAsync).RequireAuthorization("isadmin");
             return group;
         }
 

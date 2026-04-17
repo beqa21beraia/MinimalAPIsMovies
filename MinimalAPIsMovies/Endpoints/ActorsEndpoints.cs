@@ -20,9 +20,18 @@ namespace MinimalAPIsMovies.Endpoints
                 .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("actors-get"));
             group.MapGet("/{id:int}", GetByIdAsync);
             group.MapGet("getByName/{name}", GetByNameAsync);
-            group.MapPost("/", CreateAsync).DisableAntiforgery().AddEndpointFilter<ValidationFilter<CreateActorDTO>>();
-            group.MapPut("/{id:int}", UpdateAsync).DisableAntiforgery().AddEndpointFilter<ValidationFilter<CreateActorDTO>>();
-            group.MapDelete("/{id:int}", DeleteAsync);
+
+            group.MapPost("/", CreateAsync)
+                .DisableAntiforgery()
+                .AddEndpointFilter<ValidationFilter<CreateActorDTO>>()
+                .RequireAuthorization("isadmin");
+
+            group.MapPut("/{id:int}", UpdateAsync)
+                .DisableAntiforgery()
+                .AddEndpointFilter<ValidationFilter<CreateActorDTO>>()
+                .RequireAuthorization("isadmin");
+
+            group.MapDelete("/{id:int}", DeleteAsync).RequireAuthorization("isadmin");
             return group;
         }
         
