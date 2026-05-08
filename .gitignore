@@ -11,3 +11,7 @@ MinimalAPIsMovies/obj
 # User-specific files
 *.user
 *.suo
+
+# Logs
+*.log
+logs/

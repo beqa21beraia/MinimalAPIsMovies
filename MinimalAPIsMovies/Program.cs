@@ -12,10 +12,23 @@ using MinimalAPIsMovies.Interfaces;
 using MinimalAPIsMovies.Repositories;
 using MinimalAPIsMovies.Services;
 using MinimalAPIsMovies.Utilities;
+using Serilog;
+
+//Serilog
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+        .Build())
+    .CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Services zone - BEGIN
+
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration)
+                 .ReadFrom.Services(services));
 
 builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 builder.Services.AddIdentityCore<IdentityUser>();
@@ -83,6 +96,8 @@ builder.Services.AddMvc();
 var app = builder.Build();
 
 //Middlewares zone - BEGIN
+
+app.UseSerilogRequestLogging();
 
 app.UseSwagger();
 app.UseSwaggerUI();
