@@ -28,12 +28,16 @@ namespace MinimalAPIsMovies.Endpoints
         }
 
         static async Task<Results<CreatedAtRoute<CommentDTO>, NotFound, BadRequest<string>>> CreateAsync(int movieId,
-            CreateCommentDTO createCommentDTO, ICommentsRepository commentsRepository, 
-            IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore, 
-            IMapper mapper, IUsersService usersService)
+            CreateCommentDTO createCommentDTO, ICommentsRepository commentsRepository,
+            IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore,
+            IMapper mapper, IUsersService usersService, ILoggerFactory loggerFactory)
         {
-            if (! await moviesRepository.ExistsAsync(movieId))
+            var logger = loggerFactory.CreateLogger("CommentsEndpoints");
+            logger.LogInformation("Creating a new comment for movieId: {MovieId}", movieId);
+
+            if (!await moviesRepository.ExistsAsync(movieId))
             {
+                logger.LogWarning("Movie with id: {MovieId} was not found", movieId);
                 return TypedResults.NotFound();
             }
 
@@ -41,6 +45,7 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (user is null)
             {
+                logger.LogWarning("User was not found while creating comment for movieId: {MovieId}", movieId);
                 return TypedResults.BadRequest("user not found");
             }
 
@@ -51,30 +56,40 @@ namespace MinimalAPIsMovies.Endpoints
             await outputCacheStore.EvictByTagAsync("comments-get", default);
             var commentDTO = mapper.Map<CommentDTO>(comment);
 
+            logger.LogInformation("Comment created successfully with id: {Id} for movieId: {MovieId}", id, movieId);
             return TypedResults.CreatedAtRoute(commentDTO, "GetCommentById", new { id, movieId });
         }
 
         static async Task<Results<Ok<List<CommentDTO>>, NotFound>> GetAllAsync(int movieId,
             ICommentsRepository commentsRepository, IMoviesRepository moviesRepository,
-            IMapper mapper)
+            IMapper mapper, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("CommentsEndpoints");
+            logger.LogInformation("Fetching all comments for movieId: {MovieId}", movieId);
+
             if (!await moviesRepository.ExistsAsync(movieId))
             {
+                logger.LogWarning("Movie with id: {MovieId} was not found", movieId);
                 return TypedResults.NotFound();
             }
 
             var comments = await commentsRepository.GetAllAsync(movieId);
             var commentsDTO = mapper.Map<List<CommentDTO>>(comments);
 
+            logger.LogInformation("Returning {Count} comments for movieId: {MovieId}", commentsDTO.Count, movieId);
             return TypedResults.Ok(commentsDTO);
         }
-        
+
         static async Task<Results<Ok<CommentDTO>, NotFound>> GetByIdAsync(int movieId, int commentId,
             ICommentsRepository commentsRepository, IMoviesRepository moviesRepository,
-            IMapper mapper)
+            IMapper mapper, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("CommentsEndpoints");
+            logger.LogInformation("Fetching comment with id: {CommentId} for movieId: {MovieId}", commentId, movieId);
+
             if (!await moviesRepository.ExistsAsync(movieId))
             {
+                logger.LogWarning("Movie with id: {MovieId} was not found", movieId);
                 return TypedResults.NotFound();
             }
 
@@ -82,21 +97,27 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (comment is null)
             {
+                logger.LogWarning("Comment with id: {CommentId} was not found", commentId);
                 return TypedResults.NotFound();
             }
 
             var commentDTO = mapper.Map<CommentDTO>(comment);
 
+            logger.LogInformation("Returning comment with id: {CommentId}", commentId);
             return TypedResults.Ok(commentDTO);
-        } 
+        }
 
         static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateAsync(int movieId, int id,
-            CreateCommentDTO createCommentDTO, ICommentsRepository commentsRepository, 
+            CreateCommentDTO createCommentDTO, ICommentsRepository commentsRepository,
             IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore, IMapper mapper,
-            IUsersService usersService)
+            IUsersService usersService, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("CommentsEndpoints");
+            logger.LogInformation("Updating comment with id: {Id} for movieId: {MovieId}", id, movieId);
+
             if (!await moviesRepository.ExistsAsync(movieId))
             {
+                logger.LogWarning("Movie with id: {MovieId} was not found", movieId);
                 return TypedResults.NotFound();
             }
 
@@ -104,6 +125,7 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (commentFromDB is null)
             {
+                logger.LogWarning("Comment with id: {Id} was not found for update", id);
                 return TypedResults.NotFound();
             }
 
@@ -111,28 +133,35 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (user is null)
             {
+                logger.LogWarning("User was not found while updating comment with id: {Id}", id);
                 return TypedResults.NotFound();
             }
 
             if (commentFromDB.UserId != user.Id)
             {
+                logger.LogWarning("User {UserId} is not authorized to update comment with id: {Id}", user.Id, id);
                 return TypedResults.Forbid();
             }
-            
+
             commentFromDB.Body = createCommentDTO.Body;
-            
+
             await commentsRepository.UpdateAsync(commentFromDB);
             await outputCacheStore.EvictByTagAsync("comments-get", default);
-            
+
+            logger.LogInformation("Comment with id: {Id} updated successfully", id);
             return TypedResults.NoContent();
         }
 
         static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteAsync(int movieId, int id,
             ICommentsRepository commentsRepository, IMoviesRepository moviesRepository,
-            IOutputCacheStore outputCacheStore, IUsersService usersService)
+            IOutputCacheStore outputCacheStore, IUsersService usersService, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("CommentsEndpoints");
+            logger.LogInformation("Deleting comment with id: {Id} for movieId: {MovieId}", id, movieId);
+
             if (!await moviesRepository.ExistsAsync(movieId))
             {
+                logger.LogWarning("Movie with id: {MovieId} was not found", movieId);
                 return TypedResults.NotFound();
             }
 
@@ -140,6 +169,7 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (commentFromDB is null)
             {
+                logger.LogWarning("Comment with id: {Id} was not found for deletion", id);
                 return TypedResults.NotFound();
             }
 
@@ -147,17 +177,20 @@ namespace MinimalAPIsMovies.Endpoints
 
             if (user is null)
             {
+                logger.LogWarning("User was not found while deleting comment with id: {Id}", id);
                 return TypedResults.NotFound();
             }
 
             if (commentFromDB.UserId != user.Id)
             {
+                logger.LogWarning("User {UserId} is not authorized to delete comment with id: {Id}", user.Id, id);
                 return TypedResults.Forbid();
             }
 
             await commentsRepository.DeleteAsync(id);
             await outputCacheStore.EvictByTagAsync("comments-get", default);
-                
+
+            logger.LogInformation("Comment with id: {Id} deleted successfully", id);
             return TypedResults.NoContent();
         }
     }
