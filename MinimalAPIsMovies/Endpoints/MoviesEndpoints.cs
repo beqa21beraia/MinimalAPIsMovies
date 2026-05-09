@@ -38,55 +38,76 @@ namespace MinimalAPIsMovies.Endpoints
 
         static async Task<Created<MovieDTO>> CreateAsync([FromForm] CreateMovieDTO createMovieDTO,
             IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore,
-            IMapper mapper, IFileStorage fileStorage)
+            IMapper mapper, IFileStorage fileStorage, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("MoviesEndpoints");
+            logger.LogInformation("Creating a new movie with title: {Title}", createMovieDTO.Title);
+
             var movie = mapper.Map<Movie>(createMovieDTO);
 
             if (createMovieDTO.Poster is not null)
             {
                 var url = await fileStorage.StoreAsync(_container, createMovieDTO.Poster);
                 movie.Poster = url;
+                logger.LogInformation("Poster stored at: {Url}", url);
             }
 
             var id = await moviesRepository.CreateAsync(movie);
             await outputCacheStore.EvictByTagAsync("movies-get", default);
             var movieDTO = mapper.Map<MovieDTO>(movie);
 
+            logger.LogInformation("Movie created successfully with id: {Id}", id);
             return TypedResults.Created($"movies/{id}", movieDTO);
         }
 
         static async Task<Ok<List<MovieDTO>>> GetAllAsync(IMoviesRepository moviesRepository,
-            IMapper mapper, int page = 1, int recordsPerPage = 10)
+            IMapper mapper, ILoggerFactory loggerFactory, int page = 1, int recordsPerPage = 10)
         {
+            var logger = loggerFactory.CreateLogger("MoviesEndpoints");
+            logger.LogInformation("Fetching all movies - Page: {Page}, RecordsPerPage: {RecordsPerPage}",
+                page, recordsPerPage);
+
             var pagination = new PaginationDTO { Page = page, RecordsPerPage = recordsPerPage };
             var movies = await moviesRepository.GetAllAsync(pagination);
             var moviesDTO = mapper.Map<List<MovieDTO>>(movies);
+
+            logger.LogInformation("Returning {Count} movies", moviesDTO.Count);
             return TypedResults.Ok(moviesDTO);
         }
 
-        static async Task<Results<Ok<MovieDTO>, NotFound>> GetByIdAsync(int id, 
-            IMoviesRepository moviesRepository, IMapper mapper)
+        static async Task<Results<Ok<MovieDTO>, NotFound>> GetByIdAsync(int id,
+            IMoviesRepository moviesRepository, IMapper mapper, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("MoviesEndpoints");
+            logger.LogInformation("Fetching movie with id: {Id}", id);
+
             var movie = await moviesRepository.GetByIdAsync(id);
-                
+
             if (movie is null)
             {
+                logger.LogWarning("Movie with id: {Id} was not found", id);
                 return TypedResults.NotFound();
             }
 
             var movieDTO = mapper.Map<MovieDTO>(movie);
+
+            logger.LogInformation("Returning movie with id: {Id}", id);
             return TypedResults.Ok(movieDTO);
         }
 
         static async Task<Results<NoContent, NotFound>> UpdateAsync(int id,
             [FromForm] CreateMovieDTO createMovieDTO, IMoviesRepository moviesRepository,
-            IFileStorage fileStorage, IOutputCacheStore outputCacheStore, 
-            IMapper mapper)
+            IFileStorage fileStorage, IOutputCacheStore outputCacheStore,
+            IMapper mapper, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("MoviesEndpoints");
+            logger.LogInformation("Updating movie with id: {Id}", id);
+
             var movieDB = await moviesRepository.GetByIdAsync(id);
 
             if (movieDB is null)
             {
+                logger.LogWarning("Movie with id: {Id} was not found for update", id);
                 return TypedResults.NotFound();
             }
 
@@ -99,42 +120,54 @@ namespace MinimalAPIsMovies.Endpoints
                 var url = await fileStorage.EditAsync(movieToUpdate.Poster,
                     _container, createMovieDTO.Poster);
                 movieToUpdate.Poster = url;
+                logger.LogInformation("Poster updated at: {Url}", url);
             }
 
             await moviesRepository.UpdateAsync(movieToUpdate);
             await outputCacheStore.EvictByTagAsync("movies-get", default);
 
+            logger.LogInformation("Movie with id: {Id} updated successfully", id);
             return TypedResults.NoContent();
         }
 
         static async Task<Results<NoContent, NotFound>> DeleteAsync(int id,
             IMoviesRepository moviesRepository, IOutputCacheStore outputCacheStore,
-            IFileStorage fileStorage)
+            IFileStorage fileStorage, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("MoviesEndpoints");
+            logger.LogInformation("Deleting movie with id: {Id}", id);
+
             var movieDB = await moviesRepository.GetByIdAsync(id);
 
             if (movieDB is null)
             {
+                logger.LogWarning("Movie with id: {Id} was not found for deletion", id);
                 return TypedResults.NotFound();
             }
 
             if (movieDB.Poster is not null)
             {
                 await fileStorage.DeleteAsync(movieDB.Poster, _container);
+                logger.LogInformation("Poster deleted for movie with id: {Id}", id);
             }
 
             await moviesRepository.DeleteAsync(id);
             await outputCacheStore.EvictByTagAsync("movies-get", default);
 
+            logger.LogInformation("Movie with id: {Id} deleted successfully", id);
             return TypedResults.NoContent();
         }
 
         static async Task<Results<NoContent, NotFound, BadRequest<string>>> AssignGenresAsync(
             int id, List<int> genresIds, IMoviesRepository moviesRepository,
-            IGenresRepository genresRepository)
+            IGenresRepository genresRepository, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("MoviesEndpoints");
+            logger.LogInformation("Assigning genres to movie with id: {Id}", id);
+
             if (!await moviesRepository.ExistsAsync(id))
             {
+                logger.LogWarning("Movie with id: {Id} was not found for genre assignment", id);
                 return TypedResults.NotFound();
             }
 
@@ -145,25 +178,31 @@ namespace MinimalAPIsMovies.Endpoints
                 existingGenreIds = await genresRepository.ExistsAsync(genresIds);
             }
 
-            if (existingGenreIds.Count !=  genresIds.Count)
+            if (existingGenreIds.Count != genresIds.Count)
             {
                 var nonExistingGenreIds = genresIds.Except(existingGenreIds);
                 var nonExistingGenreIdsCSV = string.Join(",", nonExistingGenreIds);
-
+                logger.LogWarning("Genres with ids: {Ids} do not exist", nonExistingGenreIdsCSV);
                 return TypedResults
                     .BadRequest($"The genres of Id {nonExistingGenreIdsCSV} does not exists");
             }
 
             await moviesRepository.AssignAsync(id, genresIds);
+
+            logger.LogInformation("Genres assigned successfully to movie with id: {Id}", id);
             return TypedResults.NoContent();
         }
 
         static async Task<Results<NoContent, NotFound, BadRequest<string>>> AssignActorsAsync(
-            int id, List<AssignActorMovieDTO> actorsDTO, IMoviesRepository moviesRepository, 
-            IActorsRepository actorsRepository, IMapper mapper)
+            int id, List<AssignActorMovieDTO> actorsDTO, IMoviesRepository moviesRepository,
+            IActorsRepository actorsRepository, IMapper mapper, ILoggerFactory loggerFactory)
         {
+            var logger = loggerFactory.CreateLogger("MoviesEndpoints");
+            logger.LogInformation("Assigning actors to movie with id: {Id}", id);
+
             if (!await moviesRepository.ExistsAsync(id))
             {
+                logger.LogWarning("Movie with id: {Id} was not found for actor assignment", id);
                 return TypedResults.NotFound();
             }
 
@@ -179,14 +218,16 @@ namespace MinimalAPIsMovies.Endpoints
             {
                 var nonExistingActors = actorsIDs.Except(existingActors);
                 var nonExistingActorsCSV = string.Join(",", nonExistingActors);
+                logger.LogWarning("Actors with ids: {Ids} do not exist", nonExistingActorsCSV);
                 return TypedResults
                     .BadRequest($"The actors with Id {nonExistingActorsCSV} does not exists");
             }
 
             var actors = mapper.Map<List<ActorMovie>>(actorsDTO);
             await moviesRepository.AssignAsync(id, actors);
-            
+
+            logger.LogInformation("Actors assigned successfully to movie with id: {Id}", id);
             return TypedResults.NoContent();
         }
-    } 
+    }
 }
