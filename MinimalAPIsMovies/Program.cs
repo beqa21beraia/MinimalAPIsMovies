@@ -2,10 +2,12 @@ using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using MinimalAPIsMovies.Endpoints;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
@@ -13,6 +15,7 @@ using MinimalAPIsMovies.Repositories;
 using MinimalAPIsMovies.Services;
 using MinimalAPIsMovies.Utilities;
 using Serilog;
+
 
 //Serilog
 
@@ -68,13 +71,35 @@ builder.Services.AddSwaggerGen(options =>
         Contact = new Microsoft.OpenApi.OpenApiContact
         {
             Email = "beka.beraia.2@btu.edu.ge",
-            Name = "Beqa Beraia"
+            Name = "Beqa Beraia",
+            Url = new Uri("https://www.linkedin.com/in/beqaberaia/")
         },
         License = new Microsoft.OpenApi.OpenApiLicense
         {
             Name = "MIT",
             Url = new Uri("https://opensource.org/license/mit")
         }
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT token here"
+    });
+
+    options.AddSecurityRequirement(document =>
+    {
+        var schemeRef = new OpenApiSecuritySchemeReference("Bearer", document);
+        var requirement = new OpenApiSecurityRequirement
+        {
+            [schemeRef] = []
+        };
+
+        return requirement;
     });
 });
 
@@ -145,6 +170,7 @@ app.UseStatusCodePages();
 app.UseStaticFiles();
 app.UseCors();
 app.UseOutputCache();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGroup("/genres").MapGenres();
