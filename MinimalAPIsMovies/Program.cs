@@ -59,7 +59,25 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddOutputCache();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
+    {
+        Title = "Movies API",
+        Description = "This is a web API for working with movie data",
+        Contact = new Microsoft.OpenApi.OpenApiContact
+        {
+            Email = "beka.beraia.2@btu.edu.ge",
+            Name = "Beqa Beraia"
+        },
+        License = new Microsoft.OpenApi.OpenApiLicense
+        {
+            Name = "MIT",
+            Url = new Uri("https://opensource.org/license/mit")
+        }
+    });
+});
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddTransient<IFileStorage, AzureFileStorage>();
