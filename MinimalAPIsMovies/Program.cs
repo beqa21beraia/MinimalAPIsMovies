@@ -13,6 +13,7 @@ using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Interfaces;
 using MinimalAPIsMovies.Repositories;
 using MinimalAPIsMovies.Services;
+using MinimalAPIsMovies.Swagger;
 using MinimalAPIsMovies.Utilities;
 using Serilog;
 
@@ -101,6 +102,8 @@ builder.Services.AddSwaggerGen(options =>
 
         return requirement;
     });
+
+    options.OperationFilter<AuthorizationFilter>();
 });
 
 builder.Services.AddAutoMapper(typeof(Program));
