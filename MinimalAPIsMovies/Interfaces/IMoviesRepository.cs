@@ -13,5 +13,6 @@ namespace MinimalAPIsMovies.Interfaces
         Task DeleteAsync(int id);
         Task AssignAsync(int id, List<int> genresIds);
         Task AssignAsync(int id, List<ActorMovie> actors);
+        Task<List<Movie>> FilterAsync(MoviesFilterDTO moviesFilterDTO);
     }
 }

@@ -7,6 +7,7 @@ using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Entities;
 using MinimalAPIsMovies.Filters;
 using MinimalAPIsMovies.Interfaces;
+using MinimalAPIsMovies.Utilities;
 using System.Security.Cryptography;
 
 namespace MinimalAPIsMovies.Endpoints
@@ -19,6 +20,9 @@ namespace MinimalAPIsMovies.Endpoints
             group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("movies-get"));
             group.MapGet("/{id:int}", GetByIdAsync);
+            group.MapGet("/filter", FilterMoviesAsync)
+                .AddMoviesFilterParameters()
+                .AddPaginationParameters();
 
             group.MapPost("/", CreateAsync)
                 .DisableAntiforgery()
@@ -228,6 +232,14 @@ namespace MinimalAPIsMovies.Endpoints
 
             logger.LogInformation("Actors assigned successfully to movie with id: {Id}", id);
             return TypedResults.NoContent();
+        }
+
+        static async Task<Ok<List<MovieDTO>>> FilterMoviesAsync(MoviesFilterDTO moviesFilterDTO, 
+            IMoviesRepository moviesRepository, IMapper mapper)
+        {
+            var movies = await moviesRepository.FilterAsync(moviesFilterDTO);
+            var moviesDTO = mapper.Map<List<MovieDTO>>(movies);
+            return TypedResults.Ok(moviesDTO);
         }
     }
 }

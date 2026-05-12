@@ -104,6 +104,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.OperationFilter<AuthorizationFilter>();
+    options.OperationFilter<SwaggerParametersFilter>();
 });
 
 builder.Services.AddAutoMapper(typeof(Program));

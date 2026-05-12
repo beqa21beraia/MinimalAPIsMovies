@@ -42,7 +42,7 @@ namespace MinimalAPIsMovies.Endpoints
             logger.LogInformation("Fetching all actors - Page: {Page}, RecordsPerPage: {RecordsPerPage}",
                 page, recordsPerPage);
 
-            var pagination = new PaginationDTO { Page = page, recordsPerPage = recordsPerPage };
+            var pagination = new PaginationDTO { Page = page, RecordsPerPage = recordsPerPage };
             var actors = await repository.GetAllAsync(pagination);
             var actorsDTO = mapper.Map<List<ActorDTO>>(actors);
 

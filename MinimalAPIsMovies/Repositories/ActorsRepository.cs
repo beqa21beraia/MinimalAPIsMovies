@@ -77,7 +77,7 @@ namespace MinimalAPIsMovies.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 var actors = await connection.QueryAsync<Actor>("Actors_GetAll",
-                    new {pagination.Page, pagination.recordsPerPage},
+                    new {pagination.Page, pagination.RecordsPerPage},
                     commandType: CommandType.StoredProcedure);
                 
                 var actorsCount = await connection.QuerySingleAsync<int>("Actors_Count",
