@@ -34,6 +34,11 @@ builder.Host.UseSerilog((context, services, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration)
                  .ReadFrom.Services(services));
 
+builder.Services.AddStackExchangeRedisOutputCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("redis");
+});
+
 builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 builder.Services.AddIdentityCore<IdentityUser>();
 builder.Services.AddTransient<SignInManager<IdentityUser>>();
@@ -61,7 +66,7 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader();
     });
 });
-builder.Services.AddOutputCache();
+//builder.Services.AddOutputCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
