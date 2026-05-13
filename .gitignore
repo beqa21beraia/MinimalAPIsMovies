@@ -490,3 +490,6 @@ MinimalAPIsMovies/appsettings.Development.json
 # Build results
 MinimalAPIsMovies/bin
 MinimalAPIsMovies/obj
+
+# Properties
+MinimalAPIsMovies/Properties/
