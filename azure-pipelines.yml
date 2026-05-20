@@ -1,8 +1,3 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
 - main
 
@@ -12,45 +7,120 @@ pool:
 variables:
   solution: '**/*.sln'
   project: 'MinimalAPIsMovies/MinimalAPIsMovies.csproj'
+  dbProject: 'DB/DB.sqlproj'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-steps:
+stages:
+# ==========================================
+# BUILD STAGE
+# ==========================================
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build API and Database'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET 9'
+      inputs:
+        packageType: 'sdk'
+        version: '9.0.x'
 
-- task: UseDotNet@2
-  displayName: 'Install .NET 9'
-  inputs:
-    packageType: 'sdk'
-    version: '9.0.x'
+    - task: NuGetToolInstaller@1
 
-- task: NuGetToolInstaller@1
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        restoreSolution: '$(solution)'
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+    - task: VSBuild@1
+      displayName: 'Compile Solution'
+      inputs:
+        solution: '**/*.sln'
+        configuration: '$(buildConfiguration)'
 
-- task: VSBuild@1
-  displayName: 'Compile Solution'
-  inputs:
-    solution: '**\*.sln'
-    configuration:  '$(buildConfiguration)'
-    msbuildArgs: '/p:DSP=Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider'
+    # Build the DB project into a DACPAC file
+    - task: VSBuild@1
+      displayName: 'Build Database Project'
+      inputs:
+        solution: '$(dbProject)'
+        configuration: '$(buildConfiguration)'
 
-- task: CopyFiles@2
-  inputs:
-    Contents: '**/*.dacpac'
-    flattenFolders: true
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/db'
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Web API'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '$(project)'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/api'
+        zipAfterPublish: true
 
-- task: DotNetCoreCLI@2
-  displayName: 'Building the artifacts for the Web API...'
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: $(project)
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/webapp --runtime win-x86 --self-contained'
-    zipAfterPublish: false
-    modifyOutputPath: false
+    # Copy DACPAC to artifacts
+    - task: CopyFiles@2
+      displayName: 'Copy DACPAC to Artifacts'
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
+        Contents: '**/*.dacpac'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/db'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publishing the artifacts'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+
+# ==========================================
+# DEPLOY DATABASE STAGE
+# ==========================================
+- stage: DeployDB
+  displayName: 'Deploy Database Stage'
+  dependsOn: Build
+  jobs:
+  - deployment: DeployDatabase
+    displayName: 'Deploy Database to Azure SQL'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+
+          - task: SqlAzureDacpacDeployment@1
+            displayName: 'Deploy DACPAC to Azure SQL'
+            inputs:
+              azureSubscription: 'AzureConnection'
+              AuthenticationType: 'server'
+              ServerName: 'moviesdb-server.database.windows.net'
+              DatabaseName: 'MoviesDB'
+              SqlUsername: $(DB_USERNAME)
+              SqlPassword: $(DB_PASSWORD)
+              deployType: 'DacpacTask'
+              DeploymentAction: 'Publish'
+              DacpacFile: '$(Pipeline.Workspace)/drop/db/**/*.dacpac'
+
+# ==========================================
+# DEPLOY API STAGE
+# ==========================================
+- stage: DeployAPI
+  displayName: 'Deploy API Stage'
+  dependsOn: DeployDB
+  jobs:
+  - deployment: DeployToAzure
+    displayName: 'Deploy API to Azure App Service'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure App Service'
+            inputs:
+              azureSubscription: 'AzureConnection'
+              appType: 'webApp'
+              appName: 'moviesminimalapi'
+              package: '$(Pipeline.Workspace)/drop/api/**/*.zip'
