@@ -122,5 +122,5 @@ stages:
             inputs:
               azureSubscription: 'AzureConnection'
               appType: 'webApp'
-              appName: 'moviesminimalapi'
+              appName: 'moviesminimalapi_group'
               package: '$(Pipeline.Workspace)/drop/api/**/*.zip'
