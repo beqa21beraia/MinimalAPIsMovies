@@ -9,6 +9,12 @@
 [![Azure](https://img.shields.io/badge/Azure-App%20Service-0078D4?style=flat-square&logo=microsoftazure)](https://azure.microsoft.com/)
 [![Azure SQL](https://img.shields.io/badge/Azure%20SQL-Database-CC2927?style=flat-square&logo=microsoftazure)](https://azure.microsoft.com/en-us/products/azure-sql/)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-Azure%20Pipelines-2560E0?style=flat-square&logo=azurepipelines)](https://azure.microsoft.com/en-us/products/devops/pipelines/)
+[![Azure Pipelines](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square&logo=azurepipelines)](https://azure.microsoft.com/en-us/products/devops/pipelines/)
+[![Swagger](https://img.shields.io/badge/Docs-Swagger%20UI-85EA2D?style=flat-square&logo=swagger)](https://moviesminimalapi.azurewebsites.net/swagger/index.html)
+[![REST API](https://img.shields.io/badge/API-RESTful-FF6C37?style=flat-square&logo=postman)](https://moviesminimalapi.azurewebsites.net/swagger/index.html)
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-T--SQL-CC2927?style=flat-square&logo=microsoftsqlserver)](https://www.microsoft.com/en-us/sql-server)
+[![License](https://img.shields.io/badge/License-Open%20Source-blue?style=flat-square&logo=opensourceinitiative)](https://github.com/beqa21beraia/MoviesMinimalAPI)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
 [🚀 Live Demo (Swagger UI)](https://moviesminimalapi.azurewebsites.net/swagger/index.html) · [📁 Source Code](https://github.com/beqa21beraia/MoviesMinimalAPI) · [🐛 Report an Issue](https://github.com/beqa21beraia/MoviesMinimalAPI/issues)
 
