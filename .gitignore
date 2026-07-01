@@ -486,6 +486,7 @@ $RECYCLE.BIN/
 
 # Sensitive settings
 MinimalAPIsMovies/appsettings.Development.json
+MinimalAPIsMovies/appsettings.json
 
 # Build results
 MinimalAPIsMovies/bin
